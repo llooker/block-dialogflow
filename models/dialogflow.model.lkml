@@ -1,6 +1,6 @@
 #need to update
 
-connection: "vz_feedbackloop"
+connection: "dialopgflow_bq"
 
 # include all the views
 include: "/views/**/*.view"
