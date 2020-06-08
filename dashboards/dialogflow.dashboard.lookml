@@ -452,14 +452,3 @@
     col: 0
     width: 13
     height: 12
-  filters:
-  - name: Timestamp Date
-    title: Timestamp Date
-    type: field_filter
-    default_value: 7 day
-    allow_multiple_values: true
-    required: false
-    model: covidchatbot_demo
-    explore: alpha
-    listens_to_filters: []
-    field: alpha.timestamp_date
