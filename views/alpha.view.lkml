@@ -1,5 +1,5 @@
 view: alpha {
-  sql_table_name: `transcripts.alpha`
+  sql_table_name: `rrva.transcripts`
     ;;
 
   dimension: action {
