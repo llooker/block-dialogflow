@@ -12,4 +12,7 @@ datagroup: covidchatbot_demo_default_datagroup {
 
 persist_with: covidchatbot_demo_default_datagroup
 
-explore: alpha {}
+explore: alpha {
+  label: "Dialogflow Transcripts"
+  view_label: "Dialogflow Transcripts"
+}
