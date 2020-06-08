@@ -4,7 +4,7 @@
   elements:
   - title: Fallback Rate
     name: Fallback Rate
-    model: covidchatbot_demo
+    model: alpha
     explore: alpha
     type: single_value
     fields: [alpha.fallback_rate]
@@ -28,7 +28,7 @@
     height: 4
   - title: Total Chat Sessions
     name: Total Chat Sessions
-    model: covidchatbot_demo
+    model: alpha
     explore: alpha
     type: single_value
     fields: [alpha.total_chat_sessions]
@@ -52,7 +52,7 @@
     height: 5
   - title: Total Phone Users
     name: Total Phone Users
-    model: covidchatbot_demo
+    model: alpha
     explore: alpha
     type: single_value
     fields: [alpha.total_telephone_users]
@@ -76,7 +76,7 @@
     height: 5
   - title: Top Area Codes
     name: Top Area Codes
-    model: covidchatbot_demo
+    model: alpha
     explore: alpha
     type: looker_pie
     fields: [alpha.area_code, alpha.count]
@@ -159,7 +159,7 @@
     height: 9
   - title: Total User Sessions
     name: Total User Sessions
-    model: covidchatbot_demo
+    model: alpha
     explore: alpha
     type: single_value
     fields: [alpha.count_distinct_trace]
@@ -184,7 +184,7 @@
     height: 5
   - title: Total Queries
     name: Total Queries
-    model: covidchatbot_demo
+    model: alpha
     explore: alpha
     type: single_value
     fields: [alpha.count]
@@ -238,7 +238,7 @@
     height: 5
   - title: Average Queries per Session
     name: Average Queries per Session
-    model: covidchatbot_demo
+    model: alpha
     explore: alpha
     type: single_value
     fields: [alpha.count, alpha.session_id]
@@ -296,7 +296,7 @@
     height: 5
   - title: Top User Phrases
     name: Top User Phrases
-    model: covidchatbot_demo
+    model: alpha
     explore: alpha
     type: looker_wordcloud
     fields: [alpha.resolved_query, alpha.count]
@@ -364,7 +364,7 @@
     height: 12
   - title: Top Intents
     name: Top Intents
-    model: covidchatbot_demo
+    model: alpha
     explore: alpha
     type: looker_bar
     fields: [alpha.intent_name, alpha.count]
