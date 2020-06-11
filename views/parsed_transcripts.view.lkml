@@ -3,17 +3,11 @@ view: parsed_transcripts {
     persist_for: "2 hours"
     sql: SELECT
       regexp_extract(textPayload, r'webhook_used: .*') as webhook_used,
-
       regexp_extract(textPayload, r'webhook_for_slot_filling_used: .*') as webhook_for_slot_filling_used,
-
       regexp_extract(textPayload, r'string_value: .*') as string_value,
-
       regexp_extract(textPayload, r'speech: .*') as speech,
-
       regexp_extract(textPayload, r'source: .*') as source,
-
       regexp_extract(textPayload, r'session_id: .*') as session_id,
-
       regexp_extract(textPayload, r'score: .*') as score,
       regexp_extract(textPayload, r'resolved_query: .*') as resolved_query
       ,regexp_extract(textPayload, r'responseId": ".*') as response_id,
@@ -29,7 +23,6 @@ view: parsed_transcripts {
       -- ,regexp_extract(textPayload, r'insertId: .*') as insertId
       -- ,regexp_extract(textPayload, r'logName: .*') as logName
       -- regexp_extract(textPayload, r'trace: .*') as trace,
-
       FROM `covid-19-rrva-khwrml.rrva.transcripts`
       limit 1000
        ;;
@@ -42,22 +35,25 @@ view: parsed_transcripts {
 
   dimension: webhook_used {
     type: string
-    sql: ${TABLE}.webhook_used ;;
+    sql:replace(ltrim( ${TABLE}.webhook_used, 'webhook_used:'),"\"","") ;;
+
   }
 
   dimension: webhook_for_slot_filling_used {
     type: string
-    sql: ${TABLE}.webhook_for_slot_filling_used ;;
+    sql:replace(ltrim( ${TABLE}.webhook_for_slot_filling_used, 'webhook_for_slot_filling_used:'),"\"","") ;;
+
   }
 
   dimension: string_value {
     type: string
-    sql: ${TABLE}.string_value ;;
+    sql:replace(ltrim( ${TABLE}.string_value, 'string_value: '),"\"","") ;;
+
   }
 
   dimension: speech {
     type: string
-    sql: ${TABLE}.speech ;;
+    sql:replace(ltrim( ${TABLE}.speech, 'speech: '),"\"","") ;;
   }
 
   dimension: source {
@@ -97,17 +93,22 @@ view: parsed_transcripts {
 
   dimension: intent_name {
     type: string
-    sql: ${TABLE}.intent_name ;;
+    sql: replace(ltrim( ${TABLE}.intent_name, 'intent_name:'),"\"","");;
+  }
+
+  dimension: intent_category {
+    type: string
+    sql: split(${intent_name}, '.')[OFFSET(0)];;
   }
 
   dimension: intent_id {
     type: string
-    sql: ${TABLE}.intent_id ;;
+    sql: replace(ltrim( ${TABLE}.intent_id, 'intent_id:'),"\"","");;
   }
 
   dimension: code {
-    type: string
-    sql: ${TABLE}.code ;;
+    type: number
+    sql: cast(ltrim( ${TABLE}.code, 'code:') as int64);;
   }
 
   dimension: error_type {
@@ -125,9 +126,85 @@ view: parsed_transcripts {
     sql: ${TABLE}.lang ;;
   }
 
-  dimension: receive_timestamp {
-    type: string
+  dimension_group: receive_timestamp {
+    type: time
     sql: ${TABLE}.receiveTimestamp ;;
+  }
+
+  #### Missing Dimensions ####
+
+  dimension: trace {
+    type: string
+  }
+
+  dimension: caller_id {}
+
+
+
+  measure: count_distinct_trace {
+    type: count_distinct
+    sql: ${trace} ;;
+  }
+
+  ##Below are Calculations From "Metrics to Measure" Google Doc
+
+  measure: total_chat_sessions {
+    type: count_distinct
+    sql: ${session_id} ;;
+    drill_fields: [session_id]
+  }
+
+  measure: total_telephone_users {
+    type: count_distinct
+    sql: ${caller_id} ;;
+  }
+
+  measure: total_intents {
+    type: count_distinct
+    sql: ${intent_name} ;;
+  }
+
+  measure: total_fallbacks {
+    type: count
+    filters:  {
+      field: is_fallback_intent
+      value: "true"
+    }
+  }
+
+  measure: total_successful_intents {
+    type: count
+    filters:  {
+      field: is_fallback_intent
+      value: "false"
+    }
+  }
+
+  measure: successful_intent_rate {
+    type: number
+    value_format_name: percent_2
+    sql: ${total_successful_intents}/NULLIF(${count},0) ;;
+  }
+
+  measure: fallback_rate {
+    type: number
+    value_format_name: percent_2
+    sql: ${total_fallbacks}/NULLIF(${count},0) ;;
+  }
+
+  dimension: area_code {
+    type: string
+    sql: SUBSTR(${caller_id},2,3) ;;
+  }
+
+  measure: max_timestamp {
+    type: date_time
+    sql: MAX(${receive_timestamp_raw}) ;;
+  }
+
+  measure: min_timestamp {
+    type: date_time
+    sql: MIN(${receive_timestamp_raw}) ;;
   }
 
   set: detail {
@@ -148,8 +225,6 @@ view: parsed_transcripts {
       code,
       error_type,
       is_fallback_intent,
-      lang,
-      receive_timestamp
-    ]
+      lang    ]
   }
 }
