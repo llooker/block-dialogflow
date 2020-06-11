@@ -2,6 +2,7 @@ view: parsed_transcripts {
   derived_table: {
     persist_for: "2 hours"
     sql: SELECT
+      textPayload as textPayload,
       regexp_extract(textPayload, r'webhook_used: .*') as webhook_used,
       regexp_extract(textPayload, r'webhook_for_slot_filling_used: .*') as webhook_for_slot_filling_used,
       regexp_extract(textPayload, r'string_value: .*') as string_value,
@@ -26,6 +27,11 @@ view: parsed_transcripts {
       FROM `covid-19-rrva-khwrml.rrva.transcripts`
       limit 1000
        ;;
+  }
+
+  dimension: text_payload {
+    type: string
+    sql: ${TABLE}.textPayload ;;
   }
 
   measure: count {
@@ -58,37 +64,44 @@ view: parsed_transcripts {
 
   dimension: source {
     type: string
-    sql: ${TABLE}.source ;;
+    sql:replace(ltrim( ${TABLE}.source, 'source: '),"\"","") ;;
+
   }
 
   dimension: session_id {
     type: string
-    sql: ${TABLE}.session_id ;;
+    sql:replace(ltrim( ${TABLE}.session_id, 'session_id: '),"\"","") ;;
+
   }
 
   dimension: score {
     type: string
-    sql: ${TABLE}.score ;;
+    sql:replace(ltrim( ${TABLE}.score, 'score: '),"\"","") ;;
+
   }
 
   dimension: resolved_query {
     type: string
-    sql: ${TABLE}.resolved_query ;;
+    sql:replace(ltrim( ${TABLE}.resolved_query, 'resolved_query: '),"\"","") ;;
+
   }
 
   dimension: response_id {
     type: string
-    sql: ${TABLE}.response_id ;;
+    sql:replace(ltrim( ${TABLE}.response_id, 'response_id: '),"\"","") ;;
+
   }
 
   dimension: query_text {
     type: string
-    sql: ${TABLE}.queryText ;;
+    sql:replace(ltrim( ${TABLE}.queryText, 'queryText: '),"\"","") ;;
+
   }
 
   dimension: name {
     type: string
-    sql: ${TABLE}.name ;;
+    sql:replace(ltrim( ${TABLE}.name, 'name: '),"\"","") ;;
+
   }
 
   dimension: intent_name {
@@ -118,12 +131,13 @@ view: parsed_transcripts {
 
   dimension: is_fallback_intent {
     type: string
-    sql: ${TABLE}.is_fallback_intent ;;
+    sql:replace(ltrim( ${TABLE}.is_fallback_intent, 'is_fallback_intent:'),"\"","") ;;
+
   }
 
   dimension: lang {
     type: string
-    sql: ${TABLE}.lang ;;
+    sql: replace(ltrim( ${TABLE}.lang, 'lang:'),"\"","");;
   }
 
   dimension_group: receive_timestamp {
@@ -134,10 +148,13 @@ view: parsed_transcripts {
   #### Missing Dimensions ####
 
   dimension: trace {
+    view_label: "Missing"
     type: string
   }
 
-  dimension: caller_id {}
+  dimension: caller_id {
+    view_label: "Missing"
+  }
 
 
 
@@ -193,16 +210,19 @@ view: parsed_transcripts {
   }
 
   dimension: area_code {
+    view_label: "Missing"
     type: string
     sql: SUBSTR(${caller_id},2,3) ;;
   }
 
   measure: max_timestamp {
+    view_label: "Missing"
     type: date_time
     sql: MAX(${receive_timestamp_raw}) ;;
   }
 
   measure: min_timestamp {
+    view_label: "Missing"
     type: date_time
     sql: MIN(${receive_timestamp_raw}) ;;
   }
