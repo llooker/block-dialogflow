@@ -4,7 +4,7 @@ connection: "dialopgflow_bq"
 
 # include all the views
 include: "/views/**/*.view"
-include: "/dashboards/**/*.dashboard"
+# include: "/dashboards/**/*.dashboard"
 
 datagroup: default_datagroup {
   # sql_trigger: SELECT MAX(id) FROM etl_log;;
@@ -17,3 +17,5 @@ explore: alpha {
   label: "Dialogflow Transcripts"
   view_label: "Dialogflow Transcripts"
 }
+
+explore: parsed_transcripts {}
