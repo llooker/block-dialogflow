@@ -20,7 +20,11 @@ view: parsed_transcripts {
       ,regexp_extract(textPayload, r'error_type: .*') as error_type
       ,regexp_extract(textPayload, r'is_fallback_intent: .*') as is_fallback_intent
       ,regexp_extract(textPayload, r'lang: .*') as lang
-      ,regexp_extract(textPayload, r'timestamp: .*') as receiveTimestamp
+      ,regexp_extract(textPayload, r'timestamp: .*') as receiveTimestamp,
+
+      regexp_extract(textPayload, r'id: .*') as id,
+      regexp_extract(textPayload, r'timestamp: .*') as timestamp,
+      regexp_extract(textPayload, r'source: .*') as result_source
       -- ,regexp_extract(textPayload, r'insertId: .*') as insertId
       -- ,regexp_extract(textPayload, r'logName: .*') as logName
       -- regexp_extract(textPayload, r'trace: .*') as trace,
@@ -28,6 +32,11 @@ view: parsed_transcripts {
       limit 1000
        ;;
   }
+
+
+
+
+
 
   dimension: text_payload {
     type: string
@@ -149,6 +158,22 @@ view: parsed_transcripts {
     type: time
     sql: ${TABLE}.receiveTimestamp ;;
   }
+
+  dimension: id {
+    type: string
+    sql: ${TABLE}.id ;;
+  }
+
+  dimension: timestamp {
+    type: string
+    sql: ${TABLE}.timestamp ;;
+  }
+
+  dimension: result_source {
+    type: string
+    sql: ${TABLE}.result_source ;;
+  }
+
 
   #### Missing Dimensions ####
 
