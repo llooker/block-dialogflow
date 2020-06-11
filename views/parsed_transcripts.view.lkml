@@ -1,5 +1,6 @@
 view: parsed_transcripts {
   derived_table: {
+    persist_for: "2 hours"
     sql: SELECT
       regexp_extract(textPayload, r'webhook_used: .*') as webhook_used,
 
