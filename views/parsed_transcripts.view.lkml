@@ -39,6 +39,11 @@ view: parsed_transcripts {
     drill_fields: [detail*]
   }
 
+  dimension: payload_type {
+    type: string
+    sql: split(${text_payload}, ':')[OFFSET(0)];;
+  }
+
   dimension: webhook_used {
     type: string
     sql:replace(ltrim( ${TABLE}.webhook_used, 'webhook_used:'),"\"","") ;;
