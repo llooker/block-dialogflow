@@ -18,4 +18,7 @@ explore: alpha {
   view_label: "Dialogflow Transcripts"
 }
 
-explore: parsed_transcripts {}
+explore: parsed_transcripts {
+
+
+}

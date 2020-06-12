@@ -1,7 +1,49 @@
 view: parsed_transcripts {
   derived_table: {
     persist_for: "2 hours"
-    sql: SELECT
+    #
+    #
+    sql:
+    CREATE TEMP FUNCTION proto2json(prototext STRING)
+      RETURNS STRING
+      LANGUAGE js AS """
+
+        /*TODO: maybe escape existing $ */
+
+        /* Replace all strings with opaque reference to avoid matching inside them */
+        var strings = []
+        prototext = prototext.replace(
+          /"([^"\\\\]*(\\\\.[^"\\\\]*)*)"/g,
+          function(match){
+            strings.push(match);
+            return '$'+(strings.length-1)+' '
+            }
+          )
+
+        prototext = prototext.replace(/^[A-za-z0-0 _]+\\s*:/,'');
+
+        prototext = prototext.replace(/([a-zA-Z0-9_]+)\\s*\\{/g, function(match,m1){return m1+': {';});
+
+
+
+
+        prototext = prototext.replace(/([a-zA-Z0-9_]+):/g, function(match,m1){return '"'+m1+'" :';});
+
+
+        prototext = prototext.replace(/([0-9"}])\\s*\\n\\s*"/g, function(match,m1){return m1+' ,\\n "';});
+
+        /*TODO: take repeated key values and turn them into an array*/
+
+        /* Replace string references with their original values*/
+        prototext = prototext.replace(
+          /\\$(\\d+) /g,
+          function(match,m1){
+            return strings[parseInt(m1)]
+            }
+          )
+        return '{'+prototext+'}'
+      """;
+    SELECT
       textPayload as textPayload,
       regexp_extract(textPayload, r'webhook_used: .*') as webhook_used,
       regexp_extract(textPayload, r'webhook_for_slot_filling_used: .*') as webhook_for_slot_filling_used,
@@ -28,6 +70,7 @@ view: parsed_transcripts {
       -- ,regexp_extract(textPayload, r'insertId: .*') as insertId
       -- ,regexp_extract(textPayload, r'logName: .*') as logName
       -- regexp_extract(textPayload, r'trace: .*') as trace,
+      , proto2json(textPayload) as maybe_json
       FROM `covid-19-rrva-khwrml.rrva.transcripts`
       limit 1000
        ;;
@@ -110,6 +153,14 @@ view: parsed_transcripts {
     type: string
     sql:replace(ltrim( ${TABLE}.queryText, 'queryText: '),"\"","") ;;
 
+  }
+  dimension: payload_as_json {
+    html: <div style="white-space:pre;max-width:800px;overflow:hidden">{{value}}</div> ;;
+  }
+  dimension: extract_maybe_json {
+    sql: JSON_EXTRACT(${payload_as_json}, '$.result.source') ;;
+    # or if you just want the value, rather than the JSON
+    # sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.source') ;;
   }
 
   dimension: name {
