@@ -156,7 +156,7 @@ view: parsed_transcripts {
 
   dimension_group: receive_timestamp {
     type: time
-    sql: ${TABLE}.receiveTimestamp ;;
+    sql: cast(${TABLE}.receiveTimestamp as timestamp) ;;
   }
 
   dimension: id {
@@ -164,9 +164,9 @@ view: parsed_transcripts {
     sql: ${TABLE}.id ;;
   }
 
-  dimension: timestamp {
-    type: string
-    sql: ${TABLE}.timestamp ;;
+  dimension_group: timestamp {
+    type: time
+    sql: cast(trim(replace(ltrim( ${TABLE}.timestamp, 'timestamp:'),"\"","")) as timestamp);;
   }
 
   dimension: result_source {
