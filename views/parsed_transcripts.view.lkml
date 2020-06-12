@@ -70,7 +70,7 @@ view: parsed_transcripts {
       -- ,regexp_extract(textPayload, r'insertId: .*') as insertId
       -- ,regexp_extract(textPayload, r'logName: .*') as logName
       -- regexp_extract(textPayload, r'trace: .*') as trace,
-      , proto2json(textPayload) as maybe_json
+      , proto2json(textPayload) as payload_as_json
       FROM `covid-19-rrva-khwrml.rrva.transcripts`
       limit 1000
        ;;
@@ -155,7 +155,7 @@ view: parsed_transcripts {
 
   }
   dimension: payload_as_json {
-    html: <div style="white-space:pre;max-width:800px;overflow:hidden">{{value}}</div> ;;
+    html: <div style="white-space:pre;max-width:640px;overflow:hidden">{{value}}</div> ;;
   }
   dimension: extract_maybe_json {
     sql: JSON_EXTRACT(${payload_as_json}, '$.result.source') ;;
