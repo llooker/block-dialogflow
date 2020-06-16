@@ -79,7 +79,7 @@ view: parsed_transcripts {
     SELECT
       textPayload as textPayload,
       proto2json(textPayload) as payload_as_json
-      , proto2json(textPayload,"messages,fields") as payload_as_json
+      , proto2json(textPayload,"messages,fields") as payload_as_json_messages
       FROM `covid-19-rrva-khwrml.rrva.transcripts`
       limit 1000
        ;;
