@@ -52,7 +52,7 @@ view: parsed_transcripts {
           )
         var jsonish = '{'+prototext+'}'
 
-        if(!arrayKeys){return jsonish}
+         if(!arrayKeys){return jsonish}
         var obj
         try{
           /* Parse jsonish, but replace all key#n entries with arrays*/
@@ -77,9 +77,8 @@ view: parsed_transcripts {
         return JSON.stringify(obj,undefined,1)
       """;
     SELECT
-      textPayload as textPayload,
-      proto2json(textPayload) as payload_as_json
-      , proto2json(textPayload,"messages,fields") as payload_as_json_messages
+      textPayload as textPayload
+      , proto2json(textPayload,"messages,fields") as payload_as_json
       FROM `covid-19-rrva-khwrml.rrva.transcripts`
       limit 1000
        ;;
