@@ -45,41 +45,13 @@ view: parsed_transcripts {
       """;
     SELECT
       textPayload as textPayload,
-      regexp_extract(textPayload, r'webhook_used: .*') as webhook_used,
-      regexp_extract(textPayload, r'webhook_for_slot_filling_used: .*') as webhook_for_slot_filling_used,
       regexp_extract(textPayload, r'string_value: .*') as string_value,
-      regexp_extract(textPayload, r'speech: .*') as speech,
-      regexp_extract(textPayload, r'source: .*') as source,
-      regexp_extract(textPayload, r'session_id: .*') as session_id,
-      regexp_extract(textPayload, r'score: .*') as score,
-      regexp_extract(textPayload, r'resolved_query: .*') as resolved_query
-      ,regexp_extract(textPayload, r'responseId": ".*') as response_id,
-      regexp_extract(textPayload, r'queryText": ".*') as queryText,
-      regexp_extract(textPayload, r'name": ".*') as name,
-      regexp_extract(textPayload, r'intent_name: .*') as intent_name,
-      regexp_extract(textPayload, r'intent_id: .*') as intent_id,
-      regexp_extract(textPayload, r'code: .*') as code
-      ,regexp_extract(textPayload, r'error_type: .*') as error_type
-      ,regexp_extract(textPayload, r'is_fallback_intent: .*') as is_fallback_intent
-      ,regexp_extract(textPayload, r'lang: .*') as lang
-      ,regexp_extract(textPayload, r'timestamp: .*') as receiveTimestamp,
-
-      regexp_extract(textPayload, r'id: .*') as id,
-      regexp_extract(textPayload, r'timestamp: .*') as timestamp,
-      regexp_extract(textPayload, r'source: .*') as result_source
-      -- ,regexp_extract(textPayload, r'insertId: .*') as insertId
-      -- ,regexp_extract(textPayload, r'logName: .*') as logName
-      -- regexp_extract(textPayload, r'trace: .*') as trace,
+      regexp_extract(textPayload, r'speech: .*') as speech
       , proto2json(textPayload) as payload_as_json
       FROM `covid-19-rrva-khwrml.rrva.transcripts`
       limit 1000
        ;;
   }
-
-
-
-
-
 
   dimension: text_payload {
     type: string
@@ -87,6 +59,7 @@ view: parsed_transcripts {
   }
 
   measure: count {
+    description: "Raw Count of Total User Inputs - Includes Welcome Intent"
     type: count
     drill_fields: [detail*]
   }
@@ -96,15 +69,15 @@ view: parsed_transcripts {
     sql: split(${text_payload}, ':')[OFFSET(0)];;
   }
 
-  dimension: webhook_used {
-    type: string
-    sql:replace(ltrim( ${TABLE}.webhook_used, 'webhook_used:'),"\"","") ;;
+  dimension: webhook_for_slot_filling_used {
+    type: yesno
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.webhook_for_slot_filling_used') = 'true' ;;
 
   }
 
-  dimension: webhook_for_slot_filling_used {
-    type: string
-    sql:replace(ltrim( ${TABLE}.webhook_for_slot_filling_used, 'webhook_for_slot_filling_used:'),"\"","") ;;
+  dimension: is_fallback_intent {
+    type: yesno
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.is_fallback_intent') = 'true' ;;
 
   }
 
@@ -119,27 +92,27 @@ view: parsed_transcripts {
     sql:replace(ltrim( ${TABLE}.speech, 'speech: '),"\"","") ;;
   }
 
-  dimension: source {
-    type: string
-    sql:replace(ltrim( ${TABLE}.source, 'source: '),"\"","") ;;
-
-  }
-
   dimension: session_id {
     type: string
-    sql:replace(ltrim( ${TABLE}.session_id, 'session_id: '),"\"","") ;;
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.session_id') ;;
 
   }
 
   dimension: score {
-    type: string
-    sql:replace(ltrim( ${TABLE}.score, 'score: '),"\"","") ;;
+    type: number
+    sql:JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.score')  ;;
 
   }
 
   dimension: resolved_query {
     type: string
-    sql:replace(ltrim( ${TABLE}.resolved_query, 'resolved_query: '),"\"","") ;;
+    sql:JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.resolved_query')  ;;
+
+  }
+
+  dimension: parameters {
+    type: string
+    sql:JSON_EXTRACT(${payload_as_json}, '$.result.parameters.fields')  ;;
 
   }
 
@@ -149,29 +122,18 @@ view: parsed_transcripts {
 
   }
 
-  dimension: query_text {
-    type: string
-    sql:replace(ltrim( ${TABLE}.queryText, 'queryText: '),"\"","") ;;
-
-  }
   dimension: payload_as_json {
     html: <div style="white-space:pre;max-width:640px;overflow:hidden">{{value}}</div> ;;
   }
-  dimension: extract_maybe_json {
-    sql: JSON_EXTRACT(${payload_as_json}, '$.result.source') ;;
-    # or if you just want the value, rather than the JSON
-    # sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.source') ;;
-  }
-
-  dimension: name {
+  dimension: source {
     type: string
-    sql:replace(ltrim( ${TABLE}.name, 'name: '),"\"","") ;;
-
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.source') ;;
   }
+
 
   dimension: intent_name {
     type: string
-    sql: replace(ltrim( ${TABLE}.intent_name, 'intent_name:'),"\"","");;
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.intent_name') ;;
   }
 
   dimension: intent_category {
@@ -181,28 +143,32 @@ view: parsed_transcripts {
 
   dimension: intent_id {
     type: string
-    sql: replace(ltrim( ${TABLE}.intent_id, 'intent_id:'),"\"","");;
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.intent_id') ;;
   }
 
-  dimension: code {
+  dimension: web_hook_response_time {
     type: number
-    sql: cast(ltrim( ${TABLE}.code, 'code:') as int64);;
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.webhook_response_time') ;;
   }
 
-  dimension: error_type {
+  dimension: original_webhook_payload {
     type: string
-    sql:replace(ltrim( ${TABLE}.error_type, 'error_type:'),"\"","") ;;
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.original_webhook_payload') ;;
   }
 
-  dimension: is_fallback_intent {
+  dimension: original_webhook_body {
     type: string
-    sql:replace(ltrim( ${TABLE}.is_fallback_intent, 'is_fallback_intent:'),"\"","") ;;
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.original_webhook_body') ;;
+  }
 
+  dimension: webhook_used {
+    type: string
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.webhook_used') ;;
   }
 
   dimension: lang {
     type: string
-    sql: replace(ltrim( ${TABLE}.lang, 'lang:'),"\"","");;
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.lang') ;;
   }
 
   dimension_group: receive_timestamp {
@@ -212,12 +178,12 @@ view: parsed_transcripts {
 
   dimension: id {
     type: string
-    sql: ${TABLE}.id ;;
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.id') ;;
   }
 
   dimension_group: timestamp {
     type: time
-    sql: cast(trim(replace(ltrim( ${TABLE}.timestamp, 'timestamp:'),"\"","")) as timestamp);;
+    sql: cast(JSON_EXTRACT_SCALAR(${payload_as_json}, '$.timestamp')  as timestamp);;
   }
 
   dimension: result_source {
@@ -237,7 +203,22 @@ view: parsed_transcripts {
     view_label: "Missing"
   }
 
+  dimension: query_text {
+    type: string
+    sql:replace(ltrim( ${TABLE}.queryText, 'queryText: '),"\"","") ;;
 
+  }
+
+  dimension: is_user_query {
+    type: yesno
+    sql:  ;;
+  }
+
+  dimension: name {
+    type: string
+    sql:replace(ltrim( ${TABLE}.name, 'name: '),"\"","") ;;
+
+  }
 
   measure: count_distinct_trace {
     type: count_distinct
@@ -246,10 +227,16 @@ view: parsed_transcripts {
 
   ##Below are Calculations From "Metrics to Measure" Google Doc
 
-  measure: total_chat_sessions {
+  measure: total_sessions {
     type: count_distinct
     sql: ${session_id} ;;
     drill_fields: [session_id]
+  }
+
+  measure: queries_per_session {
+    type: number
+    sql: 1.0 * ${total_user_queries} / nullif(${total_sessions},0) ;;
+    value_format_name: decimal_1
   }
 
   measure: total_telephone_users {
@@ -266,7 +253,7 @@ view: parsed_transcripts {
     type: count
     filters:  {
       field: is_fallback_intent
-      value: "true"
+      value: "yes"
     }
   }
 
@@ -274,14 +261,21 @@ view: parsed_transcripts {
     type: count
     filters:  {
       field: is_fallback_intent
-      value: "false"
+      value: "no"
     }
+  }
+
+  measure: total_user_queries {
+    description: "Total number of user questions excluding introduction text."
+    type: count
+    ### Customize this filter to only include messages related to a customer question. ####
+    filters: [intent_category: "-support"]
   }
 
   measure: successful_intent_rate {
     type: number
     value_format_name: percent_2
-    sql: ${total_successful_intents}/NULLIF(${count},0) ;;
+    sql: ${total_successful_intents}/NULLIF(${total_user_queries},0) ;;
   }
 
   measure: fallback_rate {
@@ -297,16 +291,44 @@ view: parsed_transcripts {
   }
 
   measure: max_timestamp {
-    view_label: "Missing"
     type: date_time
     sql: MAX(${receive_timestamp_raw}) ;;
   }
 
   measure: min_timestamp {
-    view_label: "Missing"
     type: date_time
     sql: MIN(${receive_timestamp_raw}) ;;
   }
+
+#
+#   Total number of users
+# *Skip
+
+
+
+# Total number of user queries
+# Count of rows per Session ID
+# Total number of telephone users
+# Count Distinct of Caller ID
+# Successful intent rate
+# Is Fallback Intent - Count of false/Total %
+# Fallback rate
+# Is Fallback Intent - Count of True/Total %
+# What intent name occurs the most across all sessions?
+# Intent Name and Session ID are metrics
+# Per-channel access percentage
+# *Skip
+# Calling Geo (area code)
+# Gotten from Caller ID based on first 3 numbers
+# Repeat Users
+# Not sure how because users get a new session ID every time they engage with the chatbot. Nothing persists unless they are using a platform where they are already authenticated.
+# *Skip
+# Total time spent on platform
+# Relevant Fields are Session ID and Timestamp  - For each row in Session ID, subtract initial timestamp from final timestamp.
+# Profanity - Not sure how to define
+# *Skip
+# Sentiment? - I think we need to enable it, I don’t see it in the logs
+
 
   set: detail {
     fields: [
@@ -323,8 +345,6 @@ view: parsed_transcripts {
       name,
       intent_name,
       intent_id,
-      code,
-      error_type,
       is_fallback_intent,
       lang    ]
   }

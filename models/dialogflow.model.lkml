@@ -19,6 +19,6 @@ explore: alpha {
 }
 
 explore: parsed_transcripts {
-
+  sql_always_where: ${payload_type} = 'Dialogflow Response ' ;;
 
 }
