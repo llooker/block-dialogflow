@@ -16,9 +16,15 @@ persist_with: default_datagroup
 explore: alpha {
   label: "Dialogflow Transcripts"
   view_label: "Dialogflow Transcripts"
+
+
 }
 
 explore: parsed_transcripts {
   sql_always_where: ${payload_type} = 'Dialogflow Response ' ;;
-
+  join: parameters {
+    view_label: "Persons: Phone:"
+    sql: LEFT JOIN UNNEST(${parsed_transcripts.parameters}) as parameters ;;
+    relationship: one_to_one
+  }
 }

@@ -84,21 +84,46 @@ view: parsed_transcripts {
        ;;
   }
 
-  dimension: text_payload {
+  dimension: id {
     type: string
-    sql: ${TABLE}.textPayload ;;
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.id') ;;
   }
 
-  measure: count {
-    description: "Raw Count of Total User Inputs - Includes Welcome Intent"
-    type: count
-    drill_fields: [detail*]
+  dimension: lang {
+    type: string
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.lang') ;;
   }
 
-  dimension: payload_type {
-    type: string
-    sql: split(${text_payload}, ':')[OFFSET(0)];;
+  dimension_group: timestamp {
+    type: time
+    sql: cast(JSON_EXTRACT_SCALAR(${payload_as_json}, '$.timestamp')  as timestamp);;
   }
+
+  dimension: session_id {
+    type: string
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.session_id') ;;
+  }
+
+  #### Result Payload ####
+
+  dimension: source {
+    type: string
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.source') ;;
+  }
+
+  dimension: resolved_query {
+    type: string
+    sql:JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.resolved_query')  ;;
+  }
+
+  dimension: score {
+    type: number
+    sql:JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.score')  ;;
+  }
+
+
+
+  #### Metadata Payload
 
   dimension: webhook_for_slot_filling_used {
     type: yesno
@@ -109,67 +134,6 @@ view: parsed_transcripts {
   dimension: is_fallback_intent {
     type: yesno
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.is_fallback_intent') = 'true' ;;
-
-  }
-
-  dimension: string_value {
-    type: string
-    sql:replace(ltrim( ${TABLE}.string_value, 'string_value: '),"\"","") ;;
-
-  }
-
-  dimension: speech {
-    type: string
-    sql:replace(ltrim( ${TABLE}.speech, 'speech: '),"\"","") ;;
-  }
-
-  dimension: session_id {
-    type: string
-    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.session_id') ;;
-
-  }
-
-  dimension: score {
-    type: number
-    sql:JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.score')  ;;
-
-  }
-
-  dimension: resolved_query {
-    type: string
-    sql:JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.resolved_query')  ;;
-
-  }
-
-  dimension: parameters {
-    type: string
-    sql:JSON_EXTRACT(${payload_as_json}, '$.result.parameters.fields')  ;;
-
-  }
-
-  dimension: response_id {
-    type: string
-    sql:replace(ltrim( ${TABLE}.response_id, 'response_id: '),"\"","") ;;
-
-  }
-
-  dimension: payload_as_json {
-    html: <div style="white-space:pre;max-width:640px;overflow:hidden">{{value}}</div> ;;
-  }
-  dimension: source {
-    type: string
-    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.source') ;;
-  }
-
-
-  dimension: intent_name {
-    type: string
-    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.intent_name') ;;
-  }
-
-  dimension: intent_category {
-    type: string
-    sql: split(${intent_name}, '.')[OFFSET(0)];;
   }
 
   dimension: intent_id {
@@ -182,9 +146,24 @@ view: parsed_transcripts {
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.webhook_response_time') ;;
   }
 
+  dimension: intent_name {
+    type: string
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.intent_name') ;;
+  }
+
+  dimension: intent_category {
+    type: string
+    sql: split(${intent_name}, '.')[OFFSET(0)];;
+  }
+
   dimension: original_webhook_payload {
     type: string
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.original_webhook_payload') ;;
+  }
+
+  dimension: webhook_used {
+    type: yesno
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.webhook_used') = 'true' ;;
   }
 
   dimension: original_webhook_body {
@@ -192,29 +171,58 @@ view: parsed_transcripts {
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.original_webhook_body') ;;
   }
 
-  dimension: webhook_used {
+### Raw Data ###
+
+  dimension: text_payload {
     type: string
-    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.webhook_used') ;;
+    sql: ${TABLE}.textPayload ;;
   }
 
-  dimension: lang {
+  dimension: payload_type {
+    ### SQL Always Where in Model File is filtering data down to only Dialogflow Requests ###
     type: string
-    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.lang') ;;
+    sql: split(${text_payload}, ':')[OFFSET(0)];;
   }
+
+  measure: count {
+    description: "Raw Count of Total User Inputs - Includes Welcome Intent"
+    type: count
+    drill_fields: [detail*]
+  }
+
+  dimension: speech {
+    type: string
+    sql:replace(ltrim( ${TABLE}.speech, 'speech: '),"\"","") ;;
+  }
+
+  dimension: parameters {
+    #Only used for unnesting join
+    type: string
+    hidden: yes
+    sql:JSON_EXTRACT_ARRAY(${payload_as_json}, '$.result.parameters.fields')  ;;
+  }
+
+  dimension: parameters_as_string {
+    type: string
+    sql:JSON_EXTRACT(${payload_as_json}, '$.result.parameters.fields')  ;;
+  }
+
+  dimension: response_id {
+    type: string
+    sql:replace(ltrim( ${TABLE}.response_id, 'response_id: '),"\"","") ;;
+
+  }
+  dimension: payload_as_json {
+    html: <div style="white-space:pre;max-width:640px;overflow:hidden">{{value}}</div> ;;
+  }
+
+
+
+
 
   dimension_group: receive_timestamp {
     type: time
     sql: cast(${TABLE}.receiveTimestamp as timestamp) ;;
-  }
-
-  dimension: id {
-    type: string
-    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.id') ;;
-  }
-
-  dimension_group: timestamp {
-    type: time
-    sql: cast(JSON_EXTRACT_SCALAR(${payload_as_json}, '$.timestamp')  as timestamp);;
   }
 
   dimension: result_source {
@@ -222,17 +230,7 @@ view: parsed_transcripts {
     sql: ${TABLE}.result_source ;;
   }
 
-
   #### Missing Dimensions ####
-
-  dimension: trace {
-    view_label: "Missing"
-    type: string
-  }
-
-  dimension: caller_id {
-    view_label: "Missing"
-  }
 
   dimension: query_text {
     type: string
@@ -275,7 +273,7 @@ view: parsed_transcripts {
     sql: ${caller_id} ;;
   }
 
-  measure: total_intents {
+  measure: distinct_intent_values {
     type: count_distinct
     sql: ${intent_name} ;;
   }
@@ -331,6 +329,17 @@ view: parsed_transcripts {
     sql: MIN(${receive_timestamp_raw}) ;;
   }
 
+#### Additional Metrics for Telephony Bots
+
+  dimension: trace {
+    view_label: "Missing"
+    type: string
+  }
+
+  dimension: caller_id {
+    view_label: "Missing"
+  }
+
 #
 #   Total number of users
 # *Skip
@@ -365,7 +374,6 @@ view: parsed_transcripts {
     fields: [
       webhook_used,
       webhook_for_slot_filling_used,
-      string_value,
       speech,
       source,
       session_id,
@@ -379,4 +387,27 @@ view: parsed_transcripts {
       is_fallback_intent,
       lang    ]
   }
+}
+
+view: parameters {
+  dimension: key {
+    type: string
+    sql:  json_extract_scalar(parameters, '$.key') ;;
+  }
+
+  dimension: value {
+    type: string
+    sql:  json_extract_scalar(parameters, '$.value.string_value') ;;
+  }
+
+  parameter: parameter_selector {
+    type: string
+    suggest_dimension: parameters.key
+  }
+
+  dimension: dynamic_value {
+    sql: (select ${value} from parameters where ${key} = 'covid-19')  ;;
+  }
+
+
 }
