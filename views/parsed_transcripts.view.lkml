@@ -112,6 +112,7 @@ view: parsed_transcripts {
   }
 
   dimension: resolved_query {
+    description: "User Question / Message to bot"
     type: string
     sql:JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.resolved_query')  ;;
   }
@@ -120,8 +121,6 @@ view: parsed_transcripts {
     type: number
     sql:JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.score')  ;;
   }
-
-
 
   #### Metadata Payload
 
@@ -171,28 +170,28 @@ view: parsed_transcripts {
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.original_webhook_body') ;;
   }
 
+### Fulfillment ####
+
+  dimension: speech {
+    description: "Bot Response"
+    type: string
+    sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.fulfillment.speech') ;;
+  }
+
+
 ### Raw Data ###
 
   dimension: text_payload {
+    view_label: "Raw Data"
     type: string
     sql: ${TABLE}.textPayload ;;
   }
 
   dimension: payload_type {
+    view_label: "Raw Data"
     ### SQL Always Where in Model File is filtering data down to only Dialogflow Requests ###
     type: string
     sql: split(${text_payload}, ':')[OFFSET(0)];;
-  }
-
-  measure: count {
-    description: "Raw Count of Total User Inputs - Includes Welcome Intent"
-    type: count
-    drill_fields: [detail*]
-  }
-
-  dimension: speech {
-    type: string
-    sql:replace(ltrim( ${TABLE}.speech, 'speech: '),"\"","") ;;
   }
 
   dimension: parameters {
@@ -203,58 +202,31 @@ view: parsed_transcripts {
   }
 
   dimension: parameters_as_string {
+    view_label: "Raw Data"
     type: string
     sql:JSON_EXTRACT(${payload_as_json}, '$.result.parameters.fields')  ;;
   }
 
-  dimension: response_id {
-    type: string
-    sql:replace(ltrim( ${TABLE}.response_id, 'response_id: '),"\"","") ;;
 
-  }
   dimension: payload_as_json {
-    html: <div style="white-space:pre;max-width:640px;overflow:hidden">{{value}}</div> ;;
-  }
 
-
-
-
-
-  dimension_group: receive_timestamp {
-    type: time
-    sql: cast(${TABLE}.receiveTimestamp as timestamp) ;;
-  }
-
-  dimension: result_source {
-    type: string
-    sql: ${TABLE}.result_source ;;
-  }
-
-  #### Missing Dimensions ####
-
-  dimension: query_text {
-    type: string
-    sql:replace(ltrim( ${TABLE}.queryText, 'queryText: '),"\"","") ;;
-
-  }
-
-  dimension: is_user_query {
-    type: yesno
-    sql:  ;;
-  }
-
-  dimension: name {
-    type: string
-    sql:replace(ltrim( ${TABLE}.name, 'name: '),"\"","") ;;
-
-  }
-
-  measure: count_distinct_trace {
-    type: count_distinct
-    sql: ${trace} ;;
+    view_label: "Raw Data"
+    html: <div style="white-space:break-spaces;max-width:640px;overflow:hidden">{{value}}</div> ;;
   }
 
   ##Below are Calculations From "Metrics to Measure" Google Doc
+
+  dimension: is_user_query {
+    #Should be exclude any intents related to welcome messages
+    type: yesno
+    sql: ${intent_category} <> 'support' ;;
+  }
+
+  measure: count {
+    description: "Raw Count of Total User Inputs - Includes Welcome Intent"
+    type: count
+    drill_fields: [detail*]
+  }
 
   measure: total_sessions {
     type: count_distinct
@@ -266,11 +238,6 @@ view: parsed_transcripts {
     type: number
     sql: 1.0 * ${total_user_queries} / nullif(${total_sessions},0) ;;
     value_format_name: decimal_1
-  }
-
-  measure: total_telephone_users {
-    type: count_distinct
-    sql: ${caller_id} ;;
   }
 
   measure: distinct_intent_values {
@@ -313,26 +280,22 @@ view: parsed_transcripts {
     sql: ${total_fallbacks}/NULLIF(${count},0) ;;
   }
 
-  dimension: area_code {
-    view_label: "Missing"
-    type: string
-    sql: SUBSTR(${caller_id},2,3) ;;
-  }
-
   measure: max_timestamp {
+    hidden: yes
     type: date_time
-    sql: MAX(${receive_timestamp_raw}) ;;
+    sql: MAX(${timestamp_raw}) ;;
   }
 
   measure: min_timestamp {
+    hidden: yes
     type: date_time
-    sql: MIN(${receive_timestamp_raw}) ;;
+    sql: MIN(${timestamp_raw}) ;;
   }
 
 #### Additional Metrics for Telephony Bots
 
   dimension: trace {
-    view_label: "Missing"
+    view_label: "Telephony Metrics"
     type: string
   }
 
@@ -340,34 +303,24 @@ view: parsed_transcripts {
     view_label: "Missing"
   }
 
-#
-#   Total number of users
-# *Skip
+  measure: count_distinct_trace {
+    view_label: "Telephony Metrics"
+    type: count_distinct
+    sql: ${trace} ;;
+  }
+
+  measure: total_telephone_users {
+    view_label: "Telephony Metrics"
+    type: count_distinct
+    sql: ${caller_id} ;;
+  }
 
 
+  dimension: area_code {
+    view_label: "Telephony Metrics"
+  }
 
-# Total number of user queries
-# Count of rows per Session ID
-# Total number of telephone users
-# Count Distinct of Caller ID
-# Successful intent rate
-# Is Fallback Intent - Count of false/Total %
-# Fallback rate
-# Is Fallback Intent - Count of True/Total %
-# What intent name occurs the most across all sessions?
-# Intent Name and Session ID are metrics
-# Per-channel access percentage
-# *Skip
-# Calling Geo (area code)
-# Gotten from Caller ID based on first 3 numbers
-# Repeat Users
-# Not sure how because users get a new session ID every time they engage with the chatbot. Nothing persists unless they are using a platform where they are already authenticated.
-# *Skip
-# Total time spent on platform
-# Relevant Fields are Session ID and Timestamp  - For each row in Session ID, subtract initial timestamp from final timestamp.
-# Profanity - Not sure how to define
-# *Skip
-# Sentiment? - I think we need to enable it, I don’t see it in the logs
+
 
 
   set: detail {
@@ -379,9 +332,6 @@ view: parsed_transcripts {
       session_id,
       score,
       resolved_query,
-      response_id,
-      query_text,
-      name,
       intent_name,
       intent_id,
       is_fallback_intent,

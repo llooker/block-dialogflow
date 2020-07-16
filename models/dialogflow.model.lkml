@@ -23,8 +23,12 @@ explore: alpha {
 explore: parsed_transcripts {
   sql_always_where: ${payload_type} = 'Dialogflow Response ' ;;
   join: parameters {
-    view_label: "Persons: Phone:"
+    view_label: "Custom Parameters"
     sql: LEFT JOIN UNNEST(${parsed_transcripts.parameters}) as parameters ;;
     relationship: one_to_one
+  }
+  join: session_facts {
+    relationship: many_to_one
+    sql_on: ${session_facts.session_id} = ${parsed_transcripts.session_id} ;;
   }
 }
