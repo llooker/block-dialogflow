@@ -87,21 +87,30 @@ view: parsed_transcripts {
   dimension: id {
     type: string
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.id') ;;
+    label: "Conversation ID"
+    group_label: "IDs"
   }
 
   dimension: lang {
     type: string
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.lang') ;;
+    label: "Language"
+    description: "Language in which conversation took place"
+    view_label: "Conversation Characteristics"
   }
 
   dimension_group: timestamp {
     type: time
     sql: cast(JSON_EXTRACT_SCALAR(${payload_as_json}, '$.timestamp')  as timestamp);;
+    group_label: "Conversation Time"
+    label: "Conversation Time"
+    description: "Time when conversation occurred"
   }
 
   dimension: session_id {
     type: string
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.session_id') ;;
+    group_label: "IDs"
   }
 
   #### Result Payload ####
@@ -109,17 +118,22 @@ view: parsed_transcripts {
   dimension: source {
     type: string
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.source') ;;
+    view_label: "Conversation Characteristics"
+    description: "Source of Conversation"
   }
 
   dimension: resolved_query {
     description: "User Question / Message to bot"
     type: string
     sql:JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.resolved_query')  ;;
+    label: "User Query"
   }
 
   dimension: score {
     type: number
     sql:JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.score')  ;;
+    view_label: "Conversation Characteristics"
+    description: "Score given to Conversation"
   }
 
   #### Metadata Payload
@@ -127,47 +141,62 @@ view: parsed_transcripts {
   dimension: webhook_for_slot_filling_used {
     type: yesno
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.webhook_for_slot_filling_used') = 'true' ;;
-
+    view_label: "Conversation Characteristics"
   }
 
   dimension: is_fallback_intent {
     type: yesno
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.is_fallback_intent') = 'true' ;;
+    description: "Whether the intent of the call was a fallback"
+    view_label: "Conversation Characteristics"
   }
 
   dimension: intent_id {
     type: string
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.intent_id') ;;
+    group_label: "Intent"
+    hidden: yes
   }
 
   dimension: web_hook_response_time {
     type: number
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.webhook_response_time') ;;
+    view_label: "Conversation Characteristics"
   }
 
   dimension: intent_name {
     type: string
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.intent_name') ;;
+    group_label: "Intent"
+    description: "A description of the caller's intent"
+    view_label: "Conversation Characteristics"
   }
 
   dimension: intent_category {
     type: string
     sql: split(${intent_name}, '.')[OFFSET(0)];;
+    group_label: "Intent"
+    drill_fields: [intent_name]
+    description: "The category associated with the caller's intent"
+    view_label: "Conversation Characteristics"
   }
 
   dimension: original_webhook_payload {
     type: string
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.original_webhook_payload') ;;
+    group_label: "Original Webhook"
   }
 
   dimension: webhook_used {
     type: yesno
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.webhook_used') = 'true' ;;
+    view_label: "Conversation Characteristics"
   }
 
   dimension: original_webhook_body {
     type: string
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.original_webhook_body') ;;
+    group_label: "Original Webhook"
   }
 
 ### Fulfillment ####
@@ -176,6 +205,7 @@ view: parsed_transcripts {
     description: "Bot Response"
     type: string
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.fulfillment.speech') ;;
+    label: "Bot Answer"
   }
 
 
@@ -220,6 +250,8 @@ view: parsed_transcripts {
     #Should be exclude any intents related to welcome messages
     type: yesno
     sql: ${intent_category} <> 'support' ;;
+    view_label: "Conversation Characteristics"
+    description: "Did the user submit a question?"
   }
 
   measure: count {
@@ -358,6 +390,13 @@ view: parameters {
   dimension: dynamic_value {
     sql: (select ${value} from parameters where ${key} = 'covid-19')  ;;
   }
+
+  dimension: country {
+    type: string
+    sql: (SELECT json_extract_scalar(parameters, '$.value.string_value') from UNNEST([${TABLE}]) WHERE ${key} = 'geo-country');;
+  }
+
+
 
 
 }
