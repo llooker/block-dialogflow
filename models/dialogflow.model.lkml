@@ -1,6 +1,6 @@
 #need to update
 
-connection: "dialopgflow_bq"
+connection: "ccai_assisted_student"
 
 # include all the views
 include: "/views/**/*.view"

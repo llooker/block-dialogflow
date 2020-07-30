@@ -79,7 +79,7 @@ view: parsed_transcripts {
     SELECT
       textPayload as textPayload
       , proto2json(textPayload,"messages,fields") as payload_as_json
-      FROM `covid-19-rrva-khwrml.rrva.transcripts`
+      FROM `ai-assisted-student.allstackdriver.dialogflow_agent`
       limit 1000
        ;;
   }
@@ -122,6 +122,13 @@ view: parsed_transcripts {
     description: "Source of Conversation"
   }
 
+  dimension: score_tier {
+    type: tier
+    sql: ${score} ;;
+    style: interval
+    tiers: [0.5,0.8,1]
+  }
+
   dimension: resolved_query {
     description: "User Question / Message to bot"
     type: string
@@ -131,7 +138,7 @@ view: parsed_transcripts {
 
   dimension: score {
     type: number
-    sql:JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.score')  ;;
+    sql:CAST(JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.score') AS NUMERIC) ;;
     view_label: "Conversation Characteristics"
     description: "Score given to Conversation"
   }
@@ -162,6 +169,10 @@ view: parsed_transcripts {
     type: number
     sql: JSON_EXTRACT_SCALAR(${payload_as_json}, '$.result.metadata.webhook_response_time') ;;
     view_label: "Conversation Characteristics"
+  }
+
+  dimension: response_time_tiers {
+
   }
 
   dimension: intent_name {
@@ -332,7 +343,7 @@ view: parsed_transcripts {
   }
 
   dimension: caller_id {
-    view_label: "Missing"
+    view_label: "Telephony Metrics"
   }
 
   measure: count_distinct_trace {
