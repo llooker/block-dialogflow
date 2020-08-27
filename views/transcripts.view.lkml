@@ -126,7 +126,7 @@ view: transcripts {
     type: string
     link: {
       label: "See Full Call Information"
-      url: "https://contactcenterai.cloud.looker.com/dashboards-next/29?File%20ID={{ value | encode_url }}"
+      url: "https://contactcenterai.cloud.looker.com/dashboards-next/31?File%20ID={{ value | encode_url }}"
     }
     sql: ${TABLE}.audiofileuri ;;
   }
