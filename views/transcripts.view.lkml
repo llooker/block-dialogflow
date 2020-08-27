@@ -278,9 +278,14 @@ view: transcripts__sentences {
     sql: generate_uuid();;
   }
 
+  dimension: speaker_tag {
+    type: string
+    sql: ${TABLE}.speakerTag ;;
+  }
+
   dimension: score {
     type: number
-    sql: ${TABLE}.sentiment ;;
+    sql: ${TABLE}.sentimentScore ;;
   }
 
   dimension: score_tier {
