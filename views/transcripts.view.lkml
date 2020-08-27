@@ -1,43 +1,70 @@
 view: transcripts {
-  sql_table_name: safplaygrounddataset.transcripts ;;
+  sql_table_name: insights_export_test.insights_data_20200825 ;;
 
   set: drill_fields {
-    fields: [call_date, fileid, agentid,duration,sentimentscore]
+    fields: [call_date, conversation_name, audio_file_uri, agentid,duration,client_sentiment_score]
   }
 
   dimension: agentid {
     label: "Agent ID"
     type: string
-    sql: "";;
+    sql: ${TABLE}.agentid;;
   }
 
-  dimension: call_id {
+  dimension: conversation_name {
+    primary_key: yes
+    alias: [call_id]
     type: string
-    sql: ${TABLE}.callid ;;
+    sql: ${TABLE}.conversationname ;;
   }
 
-#   dimension: primary_key {
-#     type: string
-#     sql: generate_UUID() ;;
-#     primary_key: yes
-#   }
-
-  dimension: agentspeaking {
-    label: "Agent Speaking"
+  dimension: agent_sentiment_magnitude {
     type: number
-    sql: ${TABLE}.speakertwospeaking ;;
+    sql: ${TABLE}.agentSentimentMagnitude ;;
   }
 
-  dimension: sentiment_tier {
+  dimension: agent_sentiment_score {
+    type: number
+    sql: ${TABLE}.agentSentimentScore ;;
+  }
+
+  dimension: agent_speaking_percentage {
+    type: number
+    sql: ${TABLE}.agentspeakingpercentage ;;
+  }
+
+  dimension: client_sentiment_magnitude {
+    type: number
+    sql: ${TABLE}.clientSentimentMagnitude ;;
+  }
+
+  dimension: client_sentiment_score {
+    type: number
+    sql: ${TABLE}.clientSentimentScore ;;
+  }
+
+  dimension: client_speaking_percentage {
+    type: number
+    sql: ${TABLE}.clientspeakingpercentage ;;
+  }
+
+  dimension: client_sentiment_tier {
     type: tier
     tiers: [-1,0,0.2, 0.4, 0.6, 0.8, 1]
     style: relational
-    sql: ${sentimentscore} ;;
+    sql: ${client_sentiment_score} ;;
+  }
+
+  dimension: agent_sentiment_tier {
+    type: tier
+    tiers: [-1,0,0.2, 0.4, 0.6, 0.8, 1]
+    style: relational
+    sql: ${agent_sentiment_score} ;;
   }
 
   measure: total_agent_speaking {
     type: sum
-    sql: ${agentspeaking} ;;
+    sql: ${agent_speaking_percentage} * ${duration} ;;
     drill_fields: [drill_fields*]
   }
 
@@ -47,7 +74,6 @@ view: transcripts {
     value_format_name: percent_1
     drill_fields: [drill_fields*]
   }
-
 
   measure: total_client_speaking {
     type: sum
@@ -64,13 +90,7 @@ view: transcripts {
   dimension: clientspeaking {
     label: "Client Speaking"
     type: number
-    sql: ${TABLE}.speakeronespeaking ;;
-  }
-
-
-  dimension: random {
-    type: number
-    sql: round(RAND()*10,0)  ;;
+    sql: ${client_speaking_percentage} * ${duration} ;;
   }
 
   dimension_group: call {
@@ -86,8 +106,10 @@ view: transcripts {
   }
 
   dimension: duration {
+    value_format_name: decimal_1
+    description: "Seconds"
     type: number
-    sql: cast(${TABLE}.duration as numeric);;
+    sql: ${TABLE}.durationnanos  / 1000000000;;
   }
 
 
@@ -96,21 +118,21 @@ view: transcripts {
     sql: ${TABLE}.entities ;;
   }
 
-  dimension: fileid {
+  dimension: audio_file_uri {
+    alias: [fileid]
     label: "File ID"
     type: string
     link: {
       label: "See Full Call Information"
       url: "https://contactcenterai.cloud.looker.com/dashboards-next/29?File%20ID={{ value | encode_url }}"
     }
-    primary_key: yes
-    sql: ${TABLE}.fileid ;;
+    sql: ${TABLE}.audiofileuri ;;
   }
 
   dimension: filename {
     label: "File Name"
     type: string
-    sql: ${TABLE}.filename ;;
+    sql: ${TABLE}.audio_file_uri ;;
     link: {
       label: "Listen to Call"
       url: "https://drive.google.com/file/d/1kr2SUts5AsM8LjE3u-bs6jlos84v2DvD/view?usp=sharing"
@@ -120,7 +142,7 @@ view: transcripts {
 
   dimension: audio_file {
     type: string
-    sql: ${filename} ;;
+    sql: ${audio_file_uri} ;;
     html:
       <audio
         controls
@@ -129,20 +151,9 @@ view: transcripts {
     ;;
   }
 
-  dimension: magnitude {
-    type: number
-    sql: ${TABLE}.magnitude ;;
-  }
-
   dimension: month {
     type: number
     sql: ${TABLE}.month ;;
-  }
-
-  dimension: nlcategory {
-    label: "NL Category"
-    type: string
-    sql: ${TABLE}.nlcategory ;;
   }
 
   dimension: sentences {
@@ -150,35 +161,18 @@ view: transcripts {
     sql: ${TABLE}.sentences ;;
   }
 
-  dimension: sentimentscore {
-    label: "Sentiment Score"
-    type: number
-    sql: ${TABLE}.sentimentscore ;;
-  }
 
-  dimension: silencescore {
-    label: "Silence Score"
-    type: number
-    sql: ${TABLE}.silencescore ;;
-  }
 
   dimension: silencesecs {
     label: "Silence Seconds"
     value_format_name: decimal_0
     type: number
-    sql: ${TABLE}.silencesecs ;;
+    sql: ${TABLE}.silencenanos / 1000000000 ;;
   }
 
-  dimension: silencevalue {
-    label: "Silence Value"
+  dimension: silence_percentage {
     type: number
-    sql: ${TABLE}.silencevalue ;;
-  }
-
-  dimension: starttime {
-    label: "Start Time"
-    type: string
-    sql: ${TABLE}.starttime ;;
+    sql: ${TABLE}.silencePercentage ;;
   }
 
   dimension: transcript {
@@ -231,16 +225,23 @@ view: transcripts {
     drill_fields: [drill_fields*]
   }
 
-  measure: average_sentiment_score{
+  measure: average_client_sentiment_score{
     type: average
-    sql: ${sentimentscore} ;;
+    sql: ${client_sentiment_score} ;;
+    value_format_name: decimal_2
+    drill_fields: [drill_fields*]
+  }
+
+  measure: average_agent_sentiment_score{
+    type: average
+    sql: ${agent_sentiment_score} ;;
     value_format_name: decimal_2
     drill_fields: [drill_fields*]
   }
 
   measure: total_call_volume {
     type: count_distinct
-    sql: ${fileid} ;;
+    sql: ${conversation_name} ;;
     drill_fields: [drill_fields*]
   }
 

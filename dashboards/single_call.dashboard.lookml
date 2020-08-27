@@ -41,7 +41,7 @@
     model: call_demo_home
     explore: transcripts
     type: looker_single_record
-    fields: [transcripts.agentid, transcripts.call_date, transcripts.nlcategory]
+    fields: [transcripts.agentid, transcripts.call_date]
     sorts: [transcripts.agentid]
     limit: 500
     column_limit: 50

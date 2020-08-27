@@ -7,7 +7,7 @@
     model: call_demo_home
     explore: transcripts
     type: single_value
-    fields: [transcripts.average_sentiment_score]
+    fields: [transcripts.average_agent_sentiment_score]
     limit: 500
     query_timezone: America/Los_Angeles
     custom_color_enabled: true
@@ -229,7 +229,7 @@
     model: call_demo_home
     explore: transcripts
     type: looker_grid
-    fields: [transcripts.agentid, transcripts.call_date, transcripts.sentimentscore,
+    fields: [transcripts.agentid, transcripts.call_date, transcripts.agent_sentiment_score,
       transcripts.silencesecs, transcripts.fileid]
     sorts: [transcripts.agentid]
     limit: 500
