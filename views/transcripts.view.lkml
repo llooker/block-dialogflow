@@ -29,6 +29,7 @@ view: transcripts {
   }
 
   dimension: agent_speaking_percentage {
+    value_format_name: percent_1
     type: number
     sql: ${TABLE}.agentspeakingpercentage ;;
   }
@@ -44,6 +45,7 @@ view: transcripts {
   }
 
   dimension: client_speaking_percentage {
+    value_format_name: percent_1
     type: number
     sql: ${TABLE}.clientspeakingpercentage ;;
   }
@@ -68,7 +70,7 @@ view: transcripts {
     drill_fields: [drill_fields*]
   }
 
-  measure: average_agent_speaking {
+  measure: average_agent_speaking_percentage {
     type: number
     sql: 1.0 * ${total_agent_speaking} / ${total_duration};;
     value_format_name: percent_1
@@ -81,7 +83,7 @@ view: transcripts {
     drill_fields: [drill_fields*]
   }
 
-  measure: average_client_speaking {
+  measure: average_client_speaking_percentage {
     type: number
     sql: 1.0 * ${total_client_speaking} / ${total_duration};;
     value_format_name: percent_1

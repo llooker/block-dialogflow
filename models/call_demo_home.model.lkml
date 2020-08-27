@@ -21,6 +21,7 @@ include: "/dashboards/*.dashboard"
 # }
 
 explore: transcripts {
+  sql_always_where: ${duration} is not null ;;
   join: transcripts__words {
     sql: ,UNNEST(transcripts.words) as transcripts__words ;;
     relationship: one_to_many
