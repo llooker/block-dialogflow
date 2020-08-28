@@ -1,5 +1,5 @@
 view: transcripts {
-  sql_table_name: insights_export_test.insights_data_20200825 ;;
+  sql_table_name: insights_export_test.insights_data_20200827 ;;
 
   set: drill_fields {
     fields: [call_date, conversation_name, audio_file_uri, agentid,duration,client_sentiment_score]
@@ -267,6 +267,23 @@ view: transcripts {
 view: transcripts__sentences {
 
 
+  dimension: end_offset_seconds {
+    type: number
+    sql: ${TABLE}.endOffsetNanos / 1000000000 ;;
+  }
+
+  dimension: start_offset_seconds {
+    type: number
+    sql: ${TABLE}.startOffsetNanos / 1000000000 ;;
+  }
+
+  dimension: time {
+    datatype: epoch
+    type: date_minute
+    sql: cast(${end_offset_seconds} as int64) ;;
+    drill_fields: [sentence, score, speaker_tag]
+  }
+
   dimension: magnitude {
     type: number
     sql: ${TABLE}.magnitude ;;
@@ -283,9 +300,15 @@ view: transcripts__sentences {
     sql: ${TABLE}.speakerTag ;;
   }
 
+  dimension: speaker {
+    type: string
+    sql: case when ${speaker_tag} = 1 then 'Client' else 'Agent' End ;;
+  }
+
   dimension: score {
     type: number
-    sql: ${TABLE}.sentimentScore ;;
+    sql: RAND() -.5 ;;
+#     sql: ${TABLE}.sentimentScore ;;
   }
 
   dimension: score_tier {
