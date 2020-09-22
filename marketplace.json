@@ -1,0 +1,35 @@
+{
+  "label": "Facebook Ads",
+  "category_label": "Models",
+  "branding": {
+    "image_uri": "https://marketplace-api.looker.com/block-icons/facebook_icon.png",
+    "tagline": "Dig into campaigns and keywords, optimize spend and allocation, and maximize channel ROI for Facebook Ads."
+  },
+
+  "constants": {
+    "CONNECTION_NAME": {
+      "label": "Connection Name",
+      "value_constraint": "connection"
+    },
+    "FACEBOOK_SCHEMA": {
+      "label": "Facebook Schema Name"
+    },
+    "CONFIG_PROJECT_NAME": {
+      "label": "Config Project Name"
+    }
+  },
+  "models": [
+    {
+      "name": "block_facebook_ads",
+      "connection_constant": "CONNECTION_NAME"
+    }
+  ],
+  "auxiliary_projects": [
+    {
+      "git_uri": "git://github.com/looker/block-facebook-ads-config.git",
+      "git_ref": "3dd04d97fb1b9fcd96b7c2d3a6be36200b1aeb14",
+      "label": "Facebook Ads Config",
+      "constant_name": "CONFIG_PROJECT_NAME"
+    }
+  ]
+}
