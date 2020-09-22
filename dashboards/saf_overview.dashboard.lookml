@@ -5,7 +5,7 @@
   elements:
   - title: Call Sentiment
     name: Call Sentiment
-    model: call_demo_home
+    model: block_dialogflow
     explore: transcripts
     type: single_value
     fields: [transcripts.average_agent_sentiment_score]
@@ -36,7 +36,7 @@
     height: 3
   - title: Call Breakdown
     name: Call Breakdown
-    model: call_demo_home
+    model: block_dialogflow
     explore: transcripts
     type: looker_donut_multiples
     fields: [transcripts.average_silence_percent]
@@ -54,7 +54,7 @@
     height: 6
   - title: Average Call Length
     name: Average Call Length
-    model: call_demo_home
+    model: block_dialogflow
     explore: transcripts
     type: single_value
     fields: [transcripts.average_duration]
@@ -68,7 +68,7 @@
     height: 3
   - title: Total Call Volume
     name: Total Call Volume
-    model: call_demo_home
+    model: block_dialogflow
     explore: transcripts
     type: single_value
     fields: [transcripts.total_call_volume]
@@ -82,7 +82,7 @@
     height: 3
   - title: Agent Speaking
     name: Agent Speaking
-    model: call_demo_home
+    model: block_dialogflow
     explore: transcripts
     type: single_value
     fields: [transcripts.average_agent_speaking_percentage]
@@ -109,7 +109,7 @@
     height: 3
   - title: Client Speaking
     name: Client Speaking
-    model: call_demo_home
+    model: block_dialogflow
     explore: transcripts
     type: single_value
     fields: [transcripts.average_client_speaking_percentage]
@@ -137,7 +137,7 @@
     height: 3
   - title: Call Distribution
     name: Call Distribution
-    model: call_demo_home
+    model: block_dialogflow
     explore: transcripts
     type: looker_bar
     fields: [transcripts.average_client_speaking_percentage, transcripts.average_agent_speaking_percentage,
@@ -180,7 +180,7 @@
     height: 5
   - title: Common Named Entities
     name: Common Named Entities
-    model: call_demo_home
+    model: block_dialogflow
     explore: transcripts
     type: looker_wordcloud
     fields: [transcripts.total_call_volume, transcripts__entities.name]
@@ -227,7 +227,7 @@
     height: 7
   - title: Call Log
     name: Call Log
-    model: call_demo_home
+    model: block_dialogflow
     explore: transcripts
     type: looker_grid
     fields: [transcripts.call_date, transcripts.audio_file_uri, transcripts.agentid,
@@ -262,7 +262,7 @@
     height: 6
   - title: Average Call Duration by Hour of Day
     name: Average Call Duration by Hour of Day
-    model: call_demo_home
+    model: block_dialogflow
     explore: transcripts
     type: looker_column
     fields: [transcripts.average_duration, transcripts.total_call_volume, transcripts.call_hour_of_day]
@@ -312,7 +312,7 @@
     height: 7
   - title: Silent Time
     name: Silent Time
-    model: call_demo_home
+    model: block_dialogflow
     explore: transcripts
     type: single_value
     fields: [transcripts.average_silence_percent]
@@ -347,7 +347,7 @@
     ui_config:
       type: advanced
       display: popover
-    model: call_demo_home
+    model: block_dialogflow
     explore: transcripts
     listens_to_filters: []
     field: transcripts.agentid

@@ -1,5 +1,14 @@
+include: "//@{CONFIG_PROJECT_NAME}/transcripts.view.lkml"
+
+
 view: transcripts {
-  sql_table_name: insights_export_test.insights_data_20200827 ;;
+  extends: [transcripts_config]
+}
+
+###################################################
+
+view: transcripts_core {
+  sql_table_name: @{DATASET_NAME}.insights_data_20200827 ;;
 
   set: drill_fields {
     fields: [call_date, conversation_name, audio_file_uri, agentid,duration,client_sentiment_score]
@@ -261,148 +270,5 @@ view: transcripts {
   measure: count {
     type: count
     drill_fields: [drill_fields*, filename]
-  }
-}
-
-view: transcripts__sentences {
-
-
-  dimension: end_offset_seconds {
-    type: number
-    sql: ${TABLE}.endOffsetNanos / 1000000000 ;;
-  }
-
-  dimension: start_offset_seconds {
-    type: number
-    sql: ${TABLE}.startOffsetNanos / 1000000000 ;;
-  }
-
-  dimension: time {
-    datatype: epoch
-    type: date_minute
-    sql: cast(${end_offset_seconds} as int64) ;;
-    drill_fields: [sentence, score, speaker_tag]
-  }
-
-  dimension: magnitude {
-    type: number
-    sql: ${TABLE}.magnitude ;;
-  }
-
-  dimension: sentence_number {
-    type: number
-    primary_key: yes
-    sql: generate_uuid();;
-  }
-
-  dimension: speaker_tag {
-    type: string
-    sql: ${TABLE}.speakerTag ;;
-  }
-
-  dimension: speaker {
-    type: string
-    sql: case when ${speaker_tag} = 1 then 'Client' else 'Agent' End ;;
-  }
-
-  dimension: score {
-    type: number
-    sql: RAND() -.5 ;;
-#     sql: ${TABLE}.sentimentScore ;;
-  }
-
-  dimension: score_tier {
-    type: tier
-    tiers: [-1,0,0.2, 0.4, 0.6, 0.8, 1]
-    style: relational
-    sql: ${score} ;;
-  }
-
-  measure: total_sentiment {
-    type: sum
-    sql: ${score} ;;
-    value_format_name: decimal_0
-  }
-
-  measure: total_score {
-    type: sum
-    sql: ${score} ;;
-    value_format_name: decimal_1
-
-  }
-
-  measure: count_sentences {
-    type: count
-  }
-
-  dimension: sentence {
-    type: string
-    sql: ${TABLE}.sentence ;;
-#     html:
-#       {% assign var filter %}
-#
-#     {% for word in sentence %}
-#             {{word}}
-#       {% endfor %} ;;
-  }
-}
-
-view: transcripts__words {
-  dimension: confidence {
-    type: number
-    sql: ${TABLE}.confidence ;;
-  }
-
-  dimension: end_secs {
-    type: number
-    sql: ${TABLE}.endSecs ;;
-  }
-
-  dimension: speakertag {
-    type: number
-    sql: ${TABLE}.speakertag ;;
-  }
-
-  dimension: start_secs {
-    type: number
-    sql: ${TABLE}.startSecs ;;
-  }
-
-  dimension: word {
-    primary_key: yes
-    type: string
-    sql: ${TABLE}.word ;;
-  }
-  measure: words {
-    type: list
-    list_field: word
-  }
-
-  measure: full_transcript {
-    type: string
-    sql: string_agg(${word}, ' ' order by ${start_secs}) ;;
-  }
-}
-
-view: transcripts__entities {
-  dimension: name {
-    type: string
-    sql: ${TABLE}.name ;;
-  }
-
-  dimension: sentiment {
-    type: number
-    sql: ${TABLE}.sentiment ;;
-  }
-
-  measure: average_sentiment {
-    type: average
-    sql:  ${sentiment}  ;;
-    value_format_name: decimal_1
-  }
-
-  dimension: type {
-    type: string
-    sql: ${TABLE}.type ;;
   }
 }
