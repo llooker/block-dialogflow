@@ -1,4 +1,17 @@
+include: "//@{CONFIG_PROJECT_NAME}/views/*"
+
+
+##### CONTENT LAYER #####
 view: parsed_transcripts {
+  extends: [parsed_transcripts_config]
+}
+
+
+
+
+###### CORE LAYER ######
+view: parsed_transcripts_core {
+  extension: required
   derived_table: {
     persist_for: "2 hours"
     #
@@ -307,34 +320,4 @@ view: parsed_transcripts {
       is_fallback_intent,
       lang    ]
   }
-}
-
-view: parameters {
-  dimension: key {
-    type: string
-    sql:  json_extract_scalar(parameters, '$.key') ;;
-  }
-
-  dimension: value {
-    type: string
-    sql:  json_extract_scalar(parameters, '$.value.string_value') ;;
-  }
-
-  parameter: parameter_selector {
-    type: string
-    suggest_dimension: parameters.key
-  }
-
-  dimension: dynamic_value {
-    sql: (select ${value} from parameters where ${key} = 'covid-19')  ;;
-  }
-
-  dimension: country {
-    type: string
-    sql: (SELECT json_extract_scalar(parameters, '$.value.string_value') from UNNEST([${TABLE}]) WHERE ${key} = 'geo-country');;
-  }
-
-
-
-
 }

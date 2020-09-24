@@ -1,20 +1,8 @@
-#need to update
-
-connection: "ccai_assisted_student"
-
-# include all the views
-include: "/views/**/*.view"
-# include: "/dashboards/**/*.dashboard"
-
-datagroup: default_datagroup {
-  # sql_trigger: SELECT MAX(id) FROM etl_log;;
-  max_cache_age: "1 hour"
-}
-
-persist_with: default_datagroup
+include: "/views/*"
 
 
-explore: parsed_transcripts {
+explore: parsed_transcripts_core {
+  extension: required
   sql_preamble:   CREATE TEMP FUNCTION proto2json(prototext STRING, arrayKeys STRING)
       RETURNS STRING
       LANGUAGE js AS """

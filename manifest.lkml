@@ -9,11 +9,13 @@ constant: CONFIG_PROJECT_NAME {
 }
 
 constant: CONNECTION_NAME {
+  #value: "connection"
   value: "call-home-demo"
   export: override_required
 }
 
 constant: DATASET_NAME {
+  #value: "dataset"
   value: "insights_export_test"
   export: override_required
 }
@@ -23,8 +25,4 @@ constant: DATASET_NAME {
 
 local_dependency: {
   project: "@{CONFIG_PROJECT_NAME}"
-
-  override_constant: DATASET_NAME {
-    value: "@{DATASET_NAME}"
-  }
 }
