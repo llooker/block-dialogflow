@@ -3,7 +3,7 @@
   "category_label": "Models",
   "branding": {
     "image_uri": "https://marketplace-api.looker.com/block-icons/dialogflow.png",
-    "tagline": "A turnkey solution for gaining visibility into user interaction with DialogFlow applications."
+    "tagline": "A turnkey solution for gaining visibility into user interaction with Dialogflow applications."
   },
 
   "constants": {
