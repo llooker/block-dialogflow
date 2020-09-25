@@ -1,12 +1,12 @@
 #need to update
-connection: "ccai_assisted_student"
+connection: "@{CONNECTION_NAME}"
 
 # include all the views
-include: "/views/**/*.view"
-include: "/explores/*"
 include: "//@{CONFIG_PROJECT_NAME}/*.model"
 include: "//@{CONFIG_PROJECT_NAME}/views/*"
-# include: "/dashboards/**/*.dashboard"
+include: "/views/**/*.view"
+include: "/explores/*"
+include: "/dashboards/**/*.dashboard"
 
 
 

@@ -1,11 +1,9 @@
 include: "//@{CONFIG_PROJECT_NAME}/views/*"
 
-
 ##### CONTENT LAYER #####
 view: parsed_transcripts {
   extends: [parsed_transcripts_config]
 }
-
 
 
 
@@ -20,7 +18,7 @@ view: parsed_transcripts_core {
     SELECT
       textPayload as textPayload
       , proto2json(textPayload,"messages,fields") as payload_as_json
-      FROM `ai-assisted-student.allstackdriver.dialogflow_agent`
+      FROM `@{DATASET_NAME}.dialogflow_agent`
        ;;
   }
 

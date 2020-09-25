@@ -10,7 +10,7 @@ constant: CONFIG_PROJECT_NAME {
 
 constant: CONNECTION_NAME {
   #value: "connection"
-  value: "call-home-demo"
+  value: "ccai_assisted_student"
   export: override_required
 }
 
