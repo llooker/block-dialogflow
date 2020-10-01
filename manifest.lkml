@@ -9,14 +9,12 @@ constant: CONFIG_PROJECT_NAME {
 }
 
 constant: CONNECTION_NAME {
-  #value: "connection"
-  value: "ccai_assisted_student"
+  value: "your_connection"
   export: override_required
 }
 
 constant: DATASET_NAME {
-  #value: "dataset"
-  value: "insights_export_test"
+  value: "enter_your_dataset_here"
   export: override_required
 }
 

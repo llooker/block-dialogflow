@@ -32,11 +32,7 @@ This view is used to define any custom variables as well as their values that ar
 
 ### Implementation Instructions / Required Customizations
 
-**(1) Schema and Table Name in parsed_transcripts View**
-
-On line 82 of the parsed_transcripts view file, you'll need to replace the schema and table name in the FROM statement to reflect the schema and table names for where the Dialogflow transcripts are stored.
-
-**(2) Custom Variables**
+**Custom Variables**
 
 Within the parameters_view, you'll need to add any custom dimensions that you'd like to track with a dimension declaration. An example that extracts the custom dimension country from a parameter called 'geo-country' is shown below:
 
