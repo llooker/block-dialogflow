@@ -12,7 +12,7 @@
       "value_constraint": "connection"
     },
     "DATASET_NAME": {
-      "label": "DialogFlow Dataset"
+      "label": "Dialogflow Dataset"
     },
     "CONFIG_PROJECT_NAME": {
       "label": "Config Project Name"
@@ -27,7 +27,7 @@
   "auxiliary_projects": [
     {
       "git_uri": "git://github.com/looker/block-dialogflow-config.git",
-      "git_ref": "4380d8e439cad8ca885d78283cd75ee7412aeb7f",
+      "git_ref": "f5b381d976ee3d778ef469b92bc3a08e55ac8748",
       "label": "DialogFlow Block Config",
       "constant_name": "CONFIG_PROJECT_NAME"
     }
