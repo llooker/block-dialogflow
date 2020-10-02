@@ -1,3 +1,9 @@
+**NOTE: This block requires exporting Dialogflow Log Files to BigQuery via Stackdriver. Please [review the step-by-step guide](https://github.com/peterfishergcp/dialogflow-stackdriver-bq-looker) and ensure the following is complete before attempting to use this block:**
+1. Created a Dialogflow Agent
+2. Created a BigQuery DataSet to hold Dialogflow Stackdriver Logs and Looker Persistent Derived Table
+3. Created a StackDriver Sink Export to BigQuery
+
+___
 # Readme
 
 ### What does this Block do for me?
@@ -30,7 +36,7 @@ The session_id associated with an interaction is part of the Dialogflow payload.
 
 This view is used to define any custom variables as well as their values that are logged as part of a specific Dialogflow deployment.
 
-### Implementation Instructions / Required Customizations
+### Implementation Instructions
 
 **Custom Variables**
 
@@ -41,8 +47,8 @@ dimension: country {
   type: string
   sql: (
     SELECT json_extract_scalar(parameters, '$.value.string_value')
-    FROM UNNEST([${TABLE}]) WHERE ${key} = 'geo-country')
-  ;;
+    FROM UNNEST([${TABLE}]) WHERE ${key} = 'geo-country'
+  );;
 }
 ```
 

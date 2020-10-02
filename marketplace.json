@@ -9,10 +9,12 @@
   "constants": {
     "CONNECTION_NAME": {
       "label": "Connection Name",
+      "description": "Your Looker connection to BigQuery.",
       "value_constraint": "connection"
     },
     "DATASET_NAME": {
-      "label": "Dialogflow Dataset"
+      "label": "Dialogflow Dataset",
+      "description": "The dataset that receives the Dialogflow log files from Stackdriver."
     },
     "CONFIG_PROJECT_NAME": {
       "label": "Config Project Name"
@@ -27,7 +29,7 @@
   "auxiliary_projects": [
     {
       "git_uri": "git://github.com/looker/block-dialogflow-config.git",
-      "git_ref": "4a626d49c1ad41115a34bacab079a9157ca9cb2d",
+      "git_ref": "e7b5a07c1f71f5538ea2783472a5b305caaf2c4e",
       "label": "DialogFlow Block Config",
       "constant_name": "CONFIG_PROJECT_NAME"
     }
