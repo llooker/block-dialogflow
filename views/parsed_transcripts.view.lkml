@@ -11,9 +11,6 @@ view: parsed_transcripts {
 view: parsed_transcripts_core {
   extension: required
   derived_table: {
-    persist_for: "2 hours"
-    #
-    #
     sql:
     SELECT
       textPayload as textPayload
