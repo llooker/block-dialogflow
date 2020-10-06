@@ -1,6 +1,6 @@
-**NOTE: This block requires exporting Dialogflow Log Files to BigQuery via Stackdriver. Please [review the step-by-step guide](https://github.com/peterfishergcp/dialogflow-stackdriver-bq-looker) and ensure the following is complete before attempting to use this block:**
+**NOTE: This block requires exporting Dialogflow Log Files to BigQuery via Stackdriver. Please [review the step-by-step guide](https://github.com/GoogleCloudPlatform/dialogflow-integrations/stacklogs-looker) and ensure the following is complete before attempting to use this block:**
 1. Created a Dialogflow Agent
-2. Created a BigQuery DataSet to hold Dialogflow Stackdriver Logs and Looker Persistent Derived Table
+2. Created a BigQuery Dataset to hold Dialogflow Stackdriver Logs and Looker Persistent Derived Table
 3. Created a StackDriver Sink Export to BigQuery
 
 ___
@@ -45,10 +45,8 @@ Within the parameters_view, you'll need to add any custom dimensions that you'd 
 ```
 dimension: country {
   type: string
-  sql: (
-    SELECT json_extract_scalar(parameters, '$.value.string_value')
-    FROM UNNEST([${TABLE}]) WHERE ${key} = 'geo-country'
-  );;
+  sql: (SELECT json_extract_scalar(parameters, '$.value.string_value')
+    FROM UNNEST([${TABLE}]) WHERE ${key} = 'geo-country');;
 }
 ```
 

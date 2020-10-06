@@ -29,7 +29,7 @@
   "auxiliary_projects": [
     {
       "git_uri": "git://github.com/looker/block-dialogflow-config.git",
-      "git_ref": "e7b5a07c1f71f5538ea2783472a5b305caaf2c4e",
+      "git_ref": "e0ff7449de8e59705067322d828276f22ed999df",
       "label": "DialogFlow Block Config",
       "constant_name": "CONFIG_PROJECT_NAME"
     }

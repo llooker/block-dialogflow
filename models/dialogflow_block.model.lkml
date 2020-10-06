@@ -7,7 +7,7 @@ include: "//@{CONFIG_PROJECT_NAME}/views/*"
 include: "//@{CONFIG_PROJECT_NAME}/datagroups.lkml"
 include: "/views/**/*.view"
 include: "/explores/*"
-include: "/dashboards/**/*.dashboard"
+#include: "/dashboards/**/*.dashboard"
 
 
 
