@@ -1,4 +1,4 @@
-**NOTE: This block requires exporting Dialogflow Log Files to BigQuery via Stackdriver. Please [review the step-by-step guide](https://github.com/GoogleCloudPlatform/dialogflow-integrations/stacklogs-looker) and ensure the following is complete before attempting to use this block:**
+**NOTE: This block requires exporting Dialogflow Log Files to BigQuery via Stackdriver. Please [review the step-by-step guide](https://github.com/GoogleCloudPlatform/dialogflow-integrations/tree/master/stacklogs-looker) and ensure the following is complete before attempting to use this block:**
 1. Created a Dialogflow Agent
 2. Created a BigQuery Dataset to hold Dialogflow Stackdriver Logs and Looker Persistent Derived Table
 3. Created a StackDriver Sink Export to BigQuery
