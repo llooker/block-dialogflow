@@ -26,7 +26,7 @@ explore: parsed_transcripts_core {
         /* Add quotes around keys */
         prototext = prototext.replace(/([a-zA-Z0-9_]+):/g, function(match,m1){return '"'+m1+'" :';});
         /* Add commas between values */
-        prototext = prototext.replace(/([0-9"}])\\s*\\n\\s*"/g, function(match,m1){return m1+' ,\\n "';});
+        prototext = prototext.replace(/([0-9"}]|true|false)\\s*\\n\\s*"/g, function(match, m1){return m1+' ,\\n "';});
 
         /* If array keys, take matching keys and prep them to not collapse */
         if(arrayKeys){
