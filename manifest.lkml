@@ -18,6 +18,11 @@ constant: DATASET_NAME {
   export: override_required
 }
 
+constant: TABLE_PARTITION {
+  value:  ""
+  export: override_required
+}
+
 ################ Dependencies ################
 
 

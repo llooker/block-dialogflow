@@ -16,6 +16,10 @@
       "label": "Dialogflow Dataset",
       "description": "The dataset that receives the Dialogflow log files from Stackdriver."
     },
+    "TABLE_PARTITION": {
+      "label": "Table Partition",
+      "description": "If using partitioned tables, you may enter a partition here with a leading underscore: \"_<PARTITION>\""
+    },
     "CONFIG_PROJECT_NAME": {
       "label": "Config Project Name"
     }
