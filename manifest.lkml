@@ -20,7 +20,7 @@ constant: DATASET_NAME {
 
 constant: TABLE_PARTITION {
   value:  ""
-  export: override_required
+  export: override_optional
 }
 
 ################ Dependencies ################
