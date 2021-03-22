@@ -1,4 +1,5 @@
 - dashboard: covidfaqdashboard1
+  preferred_viewer: dashboards-next
   title: COVIDFAQ-Dashboard1
   layout: newspaper
   elements:
