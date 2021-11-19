@@ -1,0 +1,41 @@
+{
+  "label": "Dialogflow Parser",
+  "category_label": "Models",
+  "branding": {
+    "image_uri": "https://marketplace-api.looker.com/block-icons/dialogflow_icon.png",
+    "tagline": "A turnkey solution for gaining visibility into user interaction with Dialogflow applications."
+  },
+
+  "constants": {
+    "CONNECTION_NAME": {
+      "label": "Connection Name",
+      "description": "Your Looker connection to BigQuery.",
+      "value_constraint": "connection"
+    },
+    "DATASET_NAME": {
+      "label": "Dialogflow Dataset",
+      "description": "The dataset that receives the Dialogflow log files from Stackdriver."
+    },
+    "TABLE_PARTITION": {
+      "label": "Table Partition",
+      "description": "If using partitioned tables, you may enter a partition here with a leading underscore: \"_<PARTITION>\""
+    },
+    "CONFIG_PROJECT_NAME": {
+      "label": "Config Project Name"
+    }
+  },
+  "models": [
+    {
+      "name": "dialogflow_block",
+      "connection_constant": "CONNECTION_NAME"
+    }
+  ],
+  "auxiliary_projects": [
+    {
+      "git_uri": "git://github.com/looker/block-dialogflow-config.git",
+      "git_ref": "50c2602ba2cff5c837f9707ff3cd23f0eb964de4",
+      "label": "DialogFlow Block Config",
+      "constant_name": "CONFIG_PROJECT_NAME"
+    }
+  ]
+}
