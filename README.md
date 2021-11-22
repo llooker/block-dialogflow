@@ -37,15 +37,26 @@ The session_id associated with an interaction is part of the Dialogflow payload.
 This view is used to define any custom variables as well as their values that are logged as part of a specific Dialogflow deployment.
 
 ### Implementation Instructions
+This block is installed via the Looker Marketplace. For more information about the Looker Marketplace, please visit this [link](https://docs.looker.com/data-modeling/marketplace).
+
+#### Constants ####
+During installation you will provide two values to populate the following constants:
+* Connection Name - the Looker connection with access to and permission to retrieve data from your exported dialogflow tables.
+* Schema - the schema name for your exported data.
+* Table Partition - Table Partition Name (If Applicable).
+
+#### Customization ####
+- This block uses Refinements to allow for modification or extension of the LookML content. For more information on using refinements to customize marketplace blocks, please see [this documentation](https://docs.looker.com/data-modeling/marketplace/customize-blocks).
 
 **Custom Variables**
 
-Within the parameters_view, you'll need to add any custom dimensions that you'd like to track with a dimension declaration. An example that extracts the custom dimension country from a parameter called 'geo-country' is shown below:
+Using the refinements file, you'll be able to add any custom dimensions that you'd like to track with a dimension declaration. An example that extracts the custom dimension country from a parameter called 'geo-country' is shown below:
 
 ```
+view +parsed_transcripts {
 dimension: country {
   type: string
   sql: (SELECT json_extract_scalar(parameters, '$.value.string_value')
     FROM UNNEST([${TABLE}]) WHERE ${key} = 'geo-country');;
-}
+}}
 ```
