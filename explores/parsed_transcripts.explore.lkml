@@ -1,8 +1,6 @@
 include: "/views/*"
 
-
-explore: parsed_transcripts_core {
-  extension: required
+explore: parsed_transcripts {
   sql_preamble:   CREATE TEMP FUNCTION proto2json(prototext STRING, arrayKeys STRING)
       RETURNS STRING
       LANGUAGE js AS """

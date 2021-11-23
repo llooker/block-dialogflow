@@ -1,15 +1,4 @@
-include: "//@{CONFIG_PROJECT_NAME}/views/*"
-
-##### CONTENT LAYER #####
 view: parsed_transcripts {
-  extends: [parsed_transcripts_config]
-}
-
-
-
-###### CORE LAYER ######
-view: parsed_transcripts_core {
-  extension: required
   derived_table: {
     sql:
     SELECT

@@ -1,17 +1,6 @@
 #include: "/models/dialogflow.model.lkml"
-include: "//@{CONFIG_PROJECT_NAME}/views/*"
 
-###### CONTENT LAYER ######
 view: session_facts {
-  extends: [session_facts_config]
-}
-
-
-
-
-###### CORE LAYER ######
-view: session_facts_core {
-  extension: required
   derived_table: {
     explore_source: parsed_transcripts {
       column: max_timestamp {}

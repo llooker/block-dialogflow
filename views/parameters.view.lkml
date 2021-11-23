@@ -1,14 +1,4 @@
-include: "//@{CONFIG_PROJECT_NAME}/views/*"
-
-###### CONTENT LAYER ######
 view: parameters {
-  extends: [parameters_config]
-}
-
-
-###### CORE LAYER ######
-view: parameters_core {
-  extension: required
   dimension: key {
     type: string
     sql:  json_extract_scalar(parameters, '$.key') ;;
