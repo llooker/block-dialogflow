@@ -1,14 +1,20 @@
-- dashboard: covidfaqdashboard1
+- dashboard: dialogflow
   preferred_viewer: dashboards-next
-  title: COVIDFAQ-Dashboard1
+  title: Dialogflow Overview
   layout: newspaper
+  filters:
+    - name: Timestamp Date
+      title: 'Date Range'
+      type: date_filter
+      default_value: 30 days
+
   elements:
   - title: Fallback Rate
     name: Fallback Rate
-    model: dialogflow
-    explore: alpha
+    model: dialogflow_block
+    explore: parsed_transcripts
     type: single_value
-    fields: [alpha.fallback_rate]
+    fields: [parsed_transcripts.fallback_rate]
     limit: 500
     query_timezone: America/Los_Angeles
     custom_color_enabled: true
@@ -22,41 +28,41 @@
     conditional_formatting_include_nulls: false
     defaults_version: 1
     listen:
-      Timestamp Date: alpha.timestamp_date
+      Timestamp Date: parsed_transcripts.timestamp_date
     row: 17
     col: 10
     width: 6
     height: 4
-  - title: Total Chat Sessions
-    name: Total Chat Sessions
-    model: dialogflow
-    explore: alpha
-    type: single_value
-    fields: [alpha.total_chat_sessions]
-    limit: 500
-    query_timezone: America/Los_Angeles
-    custom_color_enabled: true
-    show_single_value_title: true
-    show_comparison: false
-    comparison_type: value
-    comparison_reverse_colors: false
-    show_comparison_label: true
-    enable_conditional_formatting: false
-    conditional_formatting_include_totals: false
-    conditional_formatting_include_nulls: false
-    defaults_version: 1
-    listen:
-      Timestamp Date: alpha.timestamp_date
-    row: 0
-    col: 4
-    width: 5
-    height: 5
+  # - title: Total Chat Sessions
+  #   name: Total Chat Sessions
+  #   model: dialogflow_block
+  #   explore: parsed_transcripts
+  #   type: single_value
+  #   fields: [parsed_transcripts.total_chat_sessions]
+  #   limit: 500
+  #   query_timezone: America/Los_Angeles
+  #   custom_color_enabled: true
+  #   show_single_value_title: true
+  #   show_comparison: false
+  #   comparison_type: value
+  #   comparison_reverse_colors: false
+  #   show_comparison_label: true
+  #   enable_conditional_formatting: false
+  #   conditional_formatting_include_totals: false
+  #   conditional_formatting_include_nulls: false
+  #   defaults_version: 1
+  #   listen:
+  #     Timestamp Date: parsed_transcripts.timestamp_date
+  #   row: 0
+  #   col: 4
+  #   width: 5
+  #   height: 5
   - title: Total Phone Users
     name: Total Phone Users
-    model: dialogflow
-    explore: alpha
+    model: dialogflow_block
+    explore: parsed_transcripts
     type: single_value
-    fields: [alpha.total_telephone_users]
+    fields: [parsed_transcripts.total_telephone_users]
     limit: 500
     query_timezone: America/Los_Angeles
     custom_color_enabled: true
@@ -70,20 +76,20 @@
     conditional_formatting_include_nulls: false
     defaults_version: 1
     listen:
-      Timestamp Date: alpha.timestamp_date
+      Timestamp Date: parsed_transcripts.timestamp_date
     row: 0
     col: 9
     width: 4
     height: 5
   - title: Top Area Codes
     name: Top Area Codes
-    model: dialogflow
-    explore: alpha
+    model: dialogflow_block
+    explore: parsed_transcripts
     type: looker_pie
-    fields: [alpha.area_code, alpha.count]
+    fields: [parsed_transcripts.area_code, parsed_transcripts.count]
     filters:
-      alpha.area_code: "-NULL"
-    sorts: [alpha.area_code]
+      parsed_transcripts.area_code: "-NULL"
+    sorts: [parsed_transcripts.area_code]
     limit: 500
     column_limit: 50
     value_labels: legend
@@ -153,17 +159,17 @@
     quantize_map_value_colors: false
     reverse_map_value_colors: false
     listen:
-      Timestamp Date: alpha.timestamp_date
+      Timestamp Date: parsed_transcripts.timestamp_date
     row: 17
     col: 0
     width: 10
     height: 9
   - title: Total User Sessions
     name: Total User Sessions
-    model: dialogflow
-    explore: alpha
+    model: dialogflow_block
+    explore: parsed_transcripts
     type: single_value
-    fields: [alpha.count_distinct_trace]
+    fields: [parsed_transcripts.count_distinct_trace]
     limit: 500
     total: true
     query_timezone: America/Los_Angeles
@@ -178,19 +184,19 @@
     conditional_formatting_include_nulls: false
     defaults_version: 1
     listen:
-      Timestamp Date: alpha.timestamp_date
+      Timestamp Date: parsed_transcripts.timestamp_date
     row: 0
     col: 0
     width: 4
     height: 5
   - title: Total Queries
     name: Total Queries
-    model: dialogflow
-    explore: alpha
+    model: dialogflow_block
+    explore: parsed_transcripts
     type: single_value
-    fields: [alpha.count]
+    fields: [parsed_transcripts.count]
     filters:
-      alpha.resolved_query: "-NULL"
+      parsed_transcripts.resolved_query: "-NULL"
     limit: 500
     column_limit: 50
     custom_color_enabled: true
@@ -232,23 +238,23 @@
     defaults_version: 1
     series_types: {}
     listen:
-      Timestamp Date: alpha.timestamp_date
+      Timestamp Date: parsed_transcripts.timestamp_date
     row: 0
     col: 13
     width: 5
     height: 5
   - title: Average Queries per Session
     name: Average Queries per Session
-    model: dialogflow
-    explore: alpha
+    model: dialogflow_block
+    explore: parsed_transcripts
     type: single_value
-    fields: [alpha.count, alpha.session_id]
+    fields: [parsed_transcripts.count, parsed_transcripts.session_id]
     filters:
-      alpha.resolved_query: "-NULL"
-    sorts: [alpha.count desc]
+      parsed_transcripts.resolved_query: "-NULL"
+    sorts: [parsed_transcripts.count desc]
     limit: 500
     column_limit: 50
-    dynamic_fields: [{table_calculation: calculation_1, label: Calculation 1, expression: 'mean(${alpha.count})',
+    dynamic_fields: [{table_calculation: calculation_1, label: Calculation 1, expression: 'mean(${parsed_transcripts.count})',
         value_format: !!null '', value_format_name: decimal_2, _kind_hint: measure,
         _type_hint: number}]
     custom_color_enabled: true
@@ -289,7 +295,7 @@
     totals_color: "#808080"
     defaults_version: 1
     series_types: {}
-    hidden_fields: [alpha.count]
+    hidden_fields: [parsed_transcripts.count]
     listen: {}
     row: 0
     col: 18
@@ -297,13 +303,13 @@
     height: 5
   - title: Top User Phrases
     name: Top User Phrases
-    model: dialogflow
-    explore: alpha
+    model: dialogflow_block
+    explore: parsed_transcripts
     type: looker_wordcloud
-    fields: [alpha.resolved_query, alpha.count]
+    fields: [parsed_transcripts.resolved_query, parsed_transcripts.count]
     filters:
-      alpha.resolved_query: -NULL,-"TELEPHONY_WARMUP",-"TELEPHONY_WELCOME",-WELCOME,-?,-"GOOGLE_ASSISTANT_WELCOME",-"HANGOUTS_WELCOME"
-    sorts: [alpha.resolved_query]
+      parsed_transcripts.resolved_query: -NULL,-"TELEPHONY_WARMUP",-"TELEPHONY_WELCOME",-WELCOME,-?,-"GOOGLE_ASSISTANT_WELCOME",-"HANGOUTS_WELCOME"
+    sorts: [parsed_transcripts.resolved_query]
     limit: 500
     column_limit: 50
     color_application: undefined
@@ -365,13 +371,13 @@
     height: 12
   - title: Top Intents
     name: Top Intents
-    model: dialogflow
-    explore: alpha
+    model: dialogflow_block
+    explore: parsed_transcripts
     type: looker_bar
-    fields: [alpha.intent_name, alpha.count]
+    fields: [parsed_transcripts.intent_name, parsed_transcripts.count]
     filters:
-      alpha.intent_name: "-NULL,-Default Welcome Intent,-Default Fallback Intent"
-    sorts: [alpha.count desc]
+      parsed_transcripts.intent_name: "-NULL,-Default Welcome Intent,-Default Fallback Intent"
+    sorts: [parsed_transcripts.count desc]
     limit: 500
     column_limit: 50
     x_axis_gridlines: false

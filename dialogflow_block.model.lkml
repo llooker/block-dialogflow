@@ -3,7 +3,7 @@ connection: "@{CONNECTION_NAME}"
 
 # include all the views
 include: "/explores/*"
-#include: "/dashboards/**/*.dashboard"
+include: "/dashboards/*.dashboard"
 
 persist_with: default_datagroup
 
